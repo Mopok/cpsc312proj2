@@ -9,6 +9,14 @@
 -}
 
 {-
+	checks if all the elments in the list are unique
+-}
+allUnique :: [Int] -> Bool
+allUnique [] = True;
+allUnique (h:t) = if (h `elem` t) then False else allUnique t
+
+
+{-
 	isValidRow takes in an array of Int which represents a row,
 	two Int clue from both sides, in West then East order, 
 	and return true if the row clues are satisfied.
@@ -22,9 +30,14 @@
 -}
 isValidRow :: [Int] -> Int -> Int -> Bool
 isValidRow [] _ _ = True
-isValidRow lst w e = ((ascendMatch lst w) && (ascendMatch (reverse lst) e))
+isValidRow lst w e = 
+ ((ascendMatch lst w) && (ascendMatch (reverse lst) e)) && allUnique lst
 
 -- by returning [Bool], we can see which row is not valid ; useful for user maybe?
+{-
+	n is (n-1)
+	ex) [[4,3,2,1],[3,4,1,2],[2,1,3,4],[1,2,4,3]] [[1,4],[2,2],[3,1],[3,2]] 3
+-}
 isValidRows :: [[Int]] -> [[Int]] -> Int -> [Bool]
 isValidRows [] _ _ = [False]
 isValidRows _ [] _ = [False]
@@ -32,6 +45,44 @@ isValidRows soln clues n =
  [isValidRow (soln !! x) ((clues!!x)!!0) ((clues!!x)!!1) | x <- [0..n]] -- rn it's [Bool]
 
 
+{-
+	n is (n-1)
+	ex) [[4,3,2,1],[3,4,1,2],[2,1,3,4],[1,2,4,3]] [[1,4],[2,2],[3,1],[3,2]] 3
+
+	isValidCols :: [[Int]] -> [[Int]] -> Int -> [Bool]
+	isValidCols [] _ _ = [False]
+	isValidCols _ [] _ = [False]
+	isValidCols soln clues n =
+ 	[isValidCols (soln !! x) ((clues!!x)!!0) ((clues!!x)!!1) | x <- [0..n]] -- rn it's [Bool]
+
+-}
+
+-- returns true if all elements are True
+isAllTrue :: [Bool] -> Bool
+isAllTrue [] = True;
+isAllTrue (h:t) = if (h == True) then isAllTrue t else False
+
+ {-
+	isSolution takes in an array of [Int], return true if it's the correct solution to
+	the puzzle.
+	Maybe take in the west&east clue as well? ([Int],[Int],[Int],[Int])
+	The four tuple is the source for the clue
+	[Int] is Soln we want to check
+	Int is the size n
+	
+	ex) isSolution ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1]) [[4,3,2,1],[3,4,1,2],[2,1,3,4],[1,2,4,3]] 3
+ -}
+isSolution :: ([Int],[Int],[Int],[Int]) -> [[Int]] -> Int -> Bool
+isSolution (_,_,_,_) [] _ = False
+-- isSolution (top,right,bottom,left) lst
+isSolution originalClues soln n =
+ isAllTrue (isValidRows soln (getRowClues originalClues) n) &&
+ isAllTrue (isValidRows soln (getColClues originalClues) n) 
+
+-- isAllTrue (isValidRows soln (getColClues originalClues) n)
+-- n = 3
+-- originalClues = ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1])
+-- soln = [[4,3,2,1],[3,4,1,2],[2,1,3,4],[1,2,4,3]]
 
 -- reverse the Array for the second Int (West side)
 {-
@@ -76,16 +127,14 @@ rowToColumn [] _ = []
 rowToColumn lst n = 
  foldr (\ x y -> [(x !! (n-1))] ++ y) [] lst 
 
+{-
+	get all columns
+	ex) rowToColumns [[4,3,2,1], [3,4,1,2], [2,1,3,4],[1,2,4,3]] 4
 
- {-
-	isSolution takes in an array of [Int], return true if it's the correct solution to
-	the puzzle.
-	Maybe take in the west&east clue as well? ([Int],[Int],[Int],[Int])
- -}
-isSolution :: ([Int],[Int],[Int],[Int]) -> [Int] -> Bool
-isSolution (_,_,_,_) [] = True
- -- isSolution (top,right,bottom,left) lst
-
+-}
+rowToColumns :: [[Int]] -> Int -> [[Int]]
+rowToColumns [] _ = []
+rowToColumns lst n = [rowToColumn lst x | x <- [1..n]]
 
 {-
 	helper to get the clues from the tuple with four [Int]
