@@ -79,7 +79,7 @@ isSolution (_,_,_,_) _ [] = False
 -- isSolution (top,right,bottom,left) lst
 isSolution originalClues n soln =
  isAllTrue (isValidRows soln (getRowClues originalClues) n) &&
- isAllTrue (isValidRows soln (getColClues originalClues) n) 
+ isAllTrue (isValidRows (rowToColumns soln (n+1)) (getColClues originalClues) n) 
 
 -- isAllTrue (isValidRows soln (getColClues originalClues) n)
 -- n = 3
