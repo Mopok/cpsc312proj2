@@ -1,0 +1,8 @@
+Links
+https://www.haskell.org/hoogle/?hoogle=transpose
+https://stackoverflow.com/questions/18691321/printing-a-2d-array-in-haskell 
+
+https://stackoverflow.com/questions/26546523/print-2d-list-of-lists-in-haskell
+
+http://www.brainbashers.com/showskyscraper.asp
+http://www.cs.sfu.ca/CourseCentral/383/pjj/a1.html
