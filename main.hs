@@ -8,7 +8,9 @@ import CheckSolutions
 
 
 
-
+{-
+   getSolution ([0,1,2,0],[0,0,0,2],[3,0,3,0],[0,0,0,0]) 4
+-}
 -- getSolution :: ([Int],[Int],[Int],[Int]) -> Int -> [[[Int]]]
 getSolution originalClues  n = 
     filter (isSolution originalClues (n-1) ) (findAllBoards n)

@@ -109,6 +109,7 @@ countHelper lst max_so_far count n
 ascendMatch :: [Int] -> Int -> Bool
 ascendMatch [] _ = True
 ascendMatch lst n
+ | n == 0 = True
  | n == 1 && (head lst) == (maximum lst) = True
  | otherwise = countHelper lst 0 0 n
 
