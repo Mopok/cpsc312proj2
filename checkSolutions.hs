@@ -209,6 +209,7 @@ eliminateObviousOnes _ [] = []
 --  whereIsTheClue (getRowClues originalClues) 1
 
 
+
 {-
 	special helper for clue = 1
 	n == size of the puzzle i.e) 4
@@ -232,7 +233,6 @@ clueIsOne cluesTuple lst n =
     (reverse [(insert [n]  (delete [1..(n-1)] ((eliminateAll cluesTuple lst n) !! (fst cluesTuple - 1))))]) ++
     (snd slices)
 
-
 {-
 	special helper for clue = 4
 	n == size of the puzzle i.e) 4
@@ -253,7 +253,6 @@ clueIsN cluesTuple lst n =
    let leftSlice = (splitAt (fst cluesTuple) lst) in
     (delete (last (fst leftSlice)) (fst leftSlice)) ++ [(reverse ([x `insert` [] | x <- [1..n]]))] ++ (snd leftSlice)
 
-
 {-
 	get rid of the N given the clue is one
 	eliminateAll  (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 1
@@ -268,22 +267,6 @@ eliminateAll cluesTuple lst numberToDelete =
   2 -> [(lst !! 0)] ++ [(deleteAll numberToDelete (lst !! 1))] ++ [(lst !! 2)] ++ [(lst !! 3)]
   3 -> [(lst !! 0)] ++ [(lst !! 1)] ++ [(deleteAll numberToDelete (lst !! 2))] ++ [(lst !! 3)]
   4 -> [(lst !! 0)] ++ [(lst !! 1)] ++ [(lst !! 2)] ++ [(deleteAll numberToDelete (lst !! 3))]
-
-
-{-
-	special helper for clue = 1
--}
--- clueIsOne :: [[[Int]]]
-
-
-
-{-
-	special helper for clue = N
--}
--- clueIsN
-
-
-
 
  {-
 	helper to delete all instance of a number within the input [[Int]]

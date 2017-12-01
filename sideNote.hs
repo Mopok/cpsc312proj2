@@ -42,13 +42,12 @@ eliminateWithSide clueSide lst n clueToDelete =
     3) elminate all 1s and Ns from that row/col
 -}
 eliminateObviousOnes :: ([Int],[Int],[Int],[Int]) -> [[[Int]]] -> Int -> [[[Int]]]
-eliminateObviousOnes _ [] = []
+eliminateObviousOnes _ [] _ = []
 -- eliminateObviousOnes originalClues lst n =
 --  whereIsTheClue (getRowClues originalClues) 1
 --  whereIsTheClue (getRowClues originalClues) 4
 -- could use iterate since it takes the previous iteration's result Then take the last, but runtime...
 -- iterate (\ clueIsOne clue(n) x n <- x == clueIsN clue(n) lst n)
-
 
 
 {-
@@ -59,9 +58,9 @@ eliminateObviousOnes _ [] = []
 	clueIsOne (3,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
 	clueIsOne (3,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
 -}
-clueIsOne :: (Int,[Char]) -> [[[Int]]] -> Int -> [[[Int]]]
+clueIsOne3 :: (Int,[Char]) -> [[[Int]]] -> Int -> [[[Int]]]
 -- this rn returns for the one Row * Maybe make it return [[[Int]]] as well?
-clueIsOne cluesTuple lst n =
+clueIsOne3 cluesTuple lst n =
  case (snd cluesTuple) of
   "East" -> 
    let slices = (splitAt (fst cluesTuple) lst) in
@@ -88,9 +87,9 @@ clueIsOne cluesTuple lst n =
 	clueIsN (3,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
 
 -}
-clueIsN :: (Int,[Char]) -> [[[Int]]] -> Int -> [[[Int]]]
+clueIsN3 :: (Int,[Char]) -> [[[Int]]] -> Int -> [[[Int]]]
 -- this rn returns for the one Row * Maybe make it return [[[Int]]] as well?
-clueIsN cluesTuple lst n =
+clueIsN3 cluesTuple lst n =
  case (snd cluesTuple) of
   "East" -> 
    let slices = (splitAt (fst cluesTuple) lst) in
@@ -106,42 +105,57 @@ clueIsN cluesTuple lst n =
 
 
 
+
+
 {-
-	returning [[Int]] version
-	{-
-	special helper for clue = 4
-	n == size of the puzzle i.e) 4
-	clueIsN (1,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
-	clueIsN (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
-	-}
-	clueIsN :: (Int,[Char]) -> [[[Int]]] -> Int -> [[Int]]
-	-- this rn returns for the one Row * Maybe make it return [[[Int]]] as well?
-	clueIsN cluesTuple lst n =
- 	case (snd cluesTuple) of
-  	"East" -> [insert x [] | x <- [1..n]]
-  	"West" -> reverse [insert x [] | x <- [1..n]]
-	--"Both"    -> lst -- can't happen
-	--"Neither" -> lst -- can't happen
-
-
-
-	{-
-	special helper for clue = 1
-	n == size of the puzzle i.e) 4
-	clueIsOne (1,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
-	clueIsOne (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
-	-}
-	clueIsOne :: (Int,[Char]) -> [[[Int]]] -> Int -> [[Int]]
-	-- this rn returns for the one Row * Maybe make it return [[[Int]]] as well?
-	clueIsOne cluesTuple lst n =
- 	case (snd cluesTuple) of
-  	"East" -> insert [n]  (delete [1..(n-1)] ((eliminateAll cluesTuple lst n) !! (fst cluesTuple - 1)))
-  	"West" -> reverse (insert [n]  (delete [1..(n-1)] ((eliminateAll cluesTuple lst n) !! (fst cluesTuple - 1))))
-	--"Both"    -> lst -- can't happen
-	--"Neither" -> lst -- can't happen
-
-
+	eliminateN
+	ex) eliminateN [(1,"West"),(0,"Neither"),(3,"East"),(0,"Neither")] [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
 -}
+eliminateN :: [(Int,[Char])] -> [[[Int]]] -> Int -> [[[Int]]]
+eliminateN [] _ _ = []
+eliminateN _ [] _ = []
+eliminateN clues lst n =
+ if fst (head clues) /= 0
+  then [(clueIsOne2 (head clues) lst n)] ++ (eliminateN (tail clues) (tail lst) n)
+  else [(head lst)] ++ (eliminateN (tail clues) (tail lst) n)
+
+
+
+-- returning [[Int]] version
+{-
+special helper for clue = 4
+n == size of the puzzle i.e) 4
+clueIsN (1,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+clueIsN (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+-}
+clueIsN2 :: (Int,[Char]) -> [[[Int]]] -> Int -> [[Int]]
+-- this rn returns for the one Row * Maybe make it return [[[Int]]] as well?
+clueIsN2 cluesTuple lst n =
+	case (snd cluesTuple) of
+	"East" -> [insert x [] | x <- [1..n]]
+	"West" -> reverse [insert x [] | x <- [1..n]]
+--"Both"    -> lst -- can't happen
+--"Neither" -> lst -- can't happen
+
+
+
+{-
+special helper for clue = 1
+n == size of the puzzle i.e) 4
+clueIsOne2 (1,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+clueIsOne2 (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+-}
+clueIsOne2 :: (Int,[Char]) -> [[[Int]]] -> Int -> [[Int]]
+-- this rn returns for the one Row * Maybe make it return [[[Int]]] as well?
+clueIsOne2 cluesTuple lst n =
+	case (snd cluesTuple) of
+	"East" -> insert [n]  (delete [1..(n-1)] ((eliminateAll cluesTuple lst n) !! (fst cluesTuple - 1)))
+	"West" -> reverse (insert [n]  (delete [1..(n-1)] ((eliminateAll cluesTuple lst n) !! (fst cluesTuple - 1))))
+--"Both"    -> lst -- can't happen
+	--"Neither" -> lst -- can't happen
+
+
+
 
 
 
@@ -369,19 +383,6 @@ getColClues :: ([Int],[Int],[Int],[Int]) -> [[Int]]
 getColClues clues = [reverse (getClue clues 3 x) | x <- [1..4]]
 
 
-{-
-    Takes in the Original clues and array of array of possible numbers for the cell
-    Then eliminates some of them according to the rule.
-    Maybe for clues 1 and N for now.
-    ([Int],[Int],[Int],[Int]) -> [[[Int]]] -> [[[Int]]]
-    1) Get the clues from the orginial clues
-    2) Note where 1 and N is
-    3) elminate all 1s and Ns from that row/col
--}
-eliminateObviousOnes :: ([Int],[Int],[Int],[Int]) -> [[[Int]]] -> [[[Int]]]
-eliminateObviousOnes _ [] = []
--- eliminateObviousOnes originalClues lst =
---  whereIsTheClue (getRowClues originalClues) 1
 
 
 
