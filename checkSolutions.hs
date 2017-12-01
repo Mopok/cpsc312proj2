@@ -1,5 +1,6 @@
 module CheckSolutions where
 
+import Data.List
 -- CPSC 312 Project 2 Jin Min
 -- import Math.Geometry.Grid.Square
 -- zed :: ([Int],[Int],[Int],[Int]) -> [[Int]]
@@ -208,37 +209,79 @@ eliminateObviousOnes _ [] = []
 --  whereIsTheClue (getRowClues originalClues) 1
 
 
+{-
+	special helper for clue = 1
+	n == size of the puzzle i.e) 4
+	clueIsOne (1,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+	clueIsOne (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+-}
+clueIsOne :: (Int,[Char]) -> [[[Int]]] -> Int -> [[[Int]]]
+-- this rn returns for the one Row * Maybe make it return [[[Int]]] as well?
+clueIsOne cluesTuple lst n =
+ case (snd cluesTuple) of
+  "East" -> insert (insert [n]  (delete [1..(n-1)] ((eliminateAll cluesTuple lst n) !! (fst cluesTuple - 1)))) (delete (lst !! (fst cluesTuple)) lst)
+  "West" -> reverse (insert (insert [n]  (delete [1..(n-1)] ((eliminateAll cluesTuple lst n) !! (fst cluesTuple - 1)))) (delete (lst !! (fst cluesTuple)) lst))
+--"Both"    -> lst -- can't happen
+--"Neither" -> lst -- can't happen
+
+
+{-
+	special helper for clue = 4
+	n == size of the puzzle i.e) 4
+	clueIsN (1,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+	clueIsN (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+-}
+clueIsN :: (Int,[Char]) -> [[[Int]]] -> Int -> [[[Int]]]
+-- this rn returns for the one Row * Maybe make it return [[[Int]]] as well?
+clueIsN cluesTuple lst n =
+ case (snd cluesTuple) of
+  "East" -> insert ([x `insert` [] | x <- [1..n]]) (delete (lst !! (fst cluesTuple)) lst)
+  "West" -> reverse (insert ([x `insert` [] | x <- [1..n]]) (delete (lst !! (fst cluesTuple)) lst))
+--"Both"    -> lst -- can't happen
+--"Neither" -> lst -- can't happen
+
 
 {-
 	get rid of the N given the clue is one
-	n is the size of the puzzle = 4, 5
+	eliminateAll  (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 1
 -}
-eliminateN :: (Int,[Char]) -> [[[Int]]] -> Int -> [[[Int]]]
-eliminateN _ [] _ = []
-eliminateN cluesTuple lst n =
+
+eliminateAll :: (Int,[Char]) -> [[[Int]]] -> Int -> [[[Int]]]
+eliminateAll _ [] _ = []
+eliminateAll cluesTuple lst numberToDelete =
  case (fst cluesTuple) of
- 	1 -> eliminateWithSide (snd cluesTuple) (lst !! 0)
- 	2 -> eliminateWithSide (snd cluesTuple) (lst !! 1)
- 	3 -> eliminateWithSide (snd cluesTuple) (lst !! 2)
- 	4 -> eliminateWithSide (snd cluesTuple) (lst !! 3)
+  0 -> lst
+  1 -> [(deleteAll numberToDelete (lst !! 0))] ++ [(lst !! 1)] ++ [(lst !! 2)] ++ [(lst !! 3)]
+  2 -> [(lst !! 0)] ++ [(deleteAll numberToDelete (lst !! 1))] ++ [(lst !! 2)] ++ [(lst !! 3)]
+  3 -> [(lst !! 0)] ++ [(lst !! 1)] ++ [(deleteAll numberToDelete (lst !! 2))] ++ [(lst !! 3)]
+  4 -> [(lst !! 0)] ++ [(lst !! 1)] ++ [(lst !! 2)] ++ [(deleteAll numberToDelete (lst !! 3))]
+
+
+{-
+	special helper for clue = 1
+-}
+-- clueIsOne :: [[[Int]]]
+
+
+
+{-
+	special helper for clue = N
+-}
+-- clueIsN
+
 
 
 
  {-
-	helper to identify which case of clue side it is
-	n is the size of the puzzle = 4, 5
+	helper to delete all instance of a number within the input [[Int]]
+	ex) deleteAll 1 [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]]
  -}
-eliminateWithSide :: (Int, [Char]) -> [[[Int]]] -> Int -> [[[Int]]]
-eliminateWithSide cluesTuple lst n =
- case (snd cluesTuple) of
- 	"West"    -> 
- 	"East"    ->
- 	"Both"    ->
- 	"Neither" ->
-
-
-
-
+deleteAll :: Int -> [[Int]] -> [[Int]]
+deleteAll _ [] = []
+deleteAll clueToDelete lst =
+ foldr (\ x y -> if clueToDelete `elem` x 
+  then [(delete clueToDelete x)] ++ y 
+   else [x] ++ y) [] lst
 
 
 {-
@@ -249,7 +292,7 @@ eliminateWithSide cluesTuple lst n =
 whereIsTheClue :: [[Int]] -> Int -> [(Int,[Char])]
 whereIsTheClue [] _ = []
 whereIsTheClue cluesForRows clueToFind =
- zip (updateIndex cluesForRows clueToFind 1 []) 
+ zip (getIndices cluesForRows clueToFind 1 []) 
   [whichSideClue clues clueToFind | clues <- cluesForRows]
  
 
@@ -271,12 +314,12 @@ whichSideClue clues clueToFind =
 	0 means the row does not have the clue.
 	n = 1 fixed for 1-base count
     acc = [] to start from empty array
-	ex) updateIndex [[1,4],[2,2],[3,1],[3,2]] 1 1 []
+	ex) getIndices [[1,4],[2,2],[3,1],[3,2]] 1 1 []
 -}
-updateIndex :: [[Int]] -> Int -> Int -> [Int] -> [Int]
-updateIndex [] _ _ _ = []
-updateIndex cluesForRows clueToFind n acc =
+getIndices :: [[Int]] -> Int -> Int -> [Int] -> [Int]
+getIndices [] _ _ _ = []
+getIndices cluesForRows clueToFind n acc =
  if (clueToFind `elem` (head cluesForRows)) 
-  then [n] ++ updateIndex (tail cluesForRows) clueToFind (n+1) acc
-   else [0] ++ updateIndex (tail cluesForRows) clueToFind (n+1) acc
+  then [n] ++ getIndices (tail cluesForRows) clueToFind (n+1) acc
+   else [0] ++ getIndices (tail cluesForRows) clueToFind (n+1) acc
 
