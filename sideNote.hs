@@ -134,7 +134,7 @@ clueIsN2 cluesTuple lst n =
 	case (snd cluesTuple) of
 	"East" -> [insert x [] | x <- [1..n]]
 	"West" -> reverse [insert x [] | x <- [1..n]]
---"Both"    -> lst -- can't happen
+--"Both"    -> lst -- can't happen but what if I just make this lst !! 0 and use it later.. (Think this approach isn't the best since index is not considered..?)
 --"Neither" -> lst -- can't happen
 
 
