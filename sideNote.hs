@@ -1,5 +1,5 @@
 import Data.List
-
+import Debug.Trace (trace)
 {-
 clueIsOne cluesTuple lst =
  case (fst cluesTuple) of
@@ -53,10 +53,10 @@ eliminateObviousOnes _ [] _ = []
 {-
 	special helper for clue = 1
 	n == size of the puzzle i.e) 4
-	clueIsOne (1,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
-	clueIsOne (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
-	clueIsOne (3,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
-	clueIsOne (3,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+	clueIsOne3 (1,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+	clueIsOne3 (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+	clueIsOne3 (3,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+	clueIsOne3 (3,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
 -}
 clueIsOne3 :: (Int,[Char]) -> [[[Int]]] -> Int -> [[[Int]]]
 -- this rn returns for the one Row * Maybe make it return [[[Int]]] as well?
@@ -74,8 +74,8 @@ clueIsOne3 cluesTuple lst n =
     (reverse [(insert [n]  (delete [1..(n-1)] ((eliminateAll cluesTuple lst n) !! (fst cluesTuple - 1))))]) ++
     (snd slices)
 -- reverse (insert (insert [n]  (delete [1..(n-1)] ((eliminateAll cluesTuple lst n) !! (fst cluesTuple - 1)))) (delete (lst !! (fst cluesTuple)) lst))
---"Both"    -> lst -- can't happen
---"Neither" -> lst -- can't happen
+  "Both"    -> lst -- can't happen
+  "Neither" -> lst -- can't happen
 
 
 {-
@@ -107,37 +107,62 @@ clueIsN3 cluesTuple lst n =
 
 
 
+
+
+
+
+{-
+	recursive function that will mutate the board with list of clues 
+	takes in [[[Int]]] which represents the board
+		     [(Int,[Char])] which represents the list of clues
+		     n which is the size of the board
+    ex) reduceBoard [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ]  [(1,"West"),(0,"Neither"),(3,"East"),(0,"Neither")] 4
+-}
+reduceBoard :: [[[Int]]] -> [(Int, [Char])] -> Int -> [[[Int]]]
+reduceBoard board [] _ = board
+reduceBoard board (h:clues) n =
+ reduceBoard (clueIsOne3 h board n) clues n
+
+
+
+
+
+
+
+
+
 {-
 	eliminateN
+	ex) eliminateN [(1,"West"),(2,"East")] [[[1,2],[1,2]],[[1,2],[1,2]]] 2
 	ex) eliminateN [(1,"West"),(0,"Neither"),(3,"East"),(0,"Neither")] [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
 -}
 eliminateN :: [(Int,[Char])] -> [[[Int]]] -> Int -> [[[Int]]]
 eliminateN [] _ _ = []
 eliminateN _ [] _ = []
 eliminateN clues lst n =
- if fst (head clues) /= 0
-  then [(clueIsOne2 (head clues) lst n)] ++ (eliminateN (tail clues) (tail lst) n)
-  else [(head lst)] ++ (eliminateN (tail clues) (tail lst) n)
-
+ if debugTrace ("line 118: " ++ show lst ++ " is it 0? ") (fst (head clues) /= 0)
+  then debugTrace ("line 119: " ++ show lst ++ " body: ") ([(clueIsOne2 (head clues) lst n)] ++ (eliminateN (tail clues) (tail lst) n))
+  else debugTrace ("line 120: " ++ show lst ++ " head: " ++ show [(head lst)] ++ "body:") ([(head lst)] ++ (eliminateN (tail clues) (tail lst) n))
 
 
 -- returning [[Int]] version
 {-
 special helper for clue = 4
 n == size of the puzzle i.e) 4
-clueIsN (1,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
-clueIsN (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+clueIsN2 (1,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+clueIsN2 (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
 -}
 clueIsN2 :: (Int,[Char]) -> [[[Int]]] -> Int -> [[Int]]
 -- this rn returns for the one Row * Maybe make it return [[[Int]]] as well?
 clueIsN2 cluesTuple lst n =
-	case (snd cluesTuple) of
-	"East" -> [insert x [] | x <- [1..n]]
-	"West" -> reverse [insert x [] | x <- [1..n]]
+ case (snd cluesTuple) of
+ "East" -> debugTrace ("line 134: ") [insert x [] | x <- [1..n]]
+ "West" -> debugTrace ("line 135: ") (reverse [insert x [] | x <- [1..n]])
 --"Both"    -> lst -- can't happen but what if I just make this lst !! 0 and use it later.. (Think this approach isn't the best since index is not considered..?)
 --"Neither" -> lst -- can't happen
 
-
+debugTrace :: Show a => String -> a -> a
+debugTrace s v = trace (s ++ show v) v
 
 {-
 special helper for clue = 1
@@ -148,11 +173,11 @@ clueIsOne2 (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,
 clueIsOne2 :: (Int,[Char]) -> [[[Int]]] -> Int -> [[Int]]
 -- this rn returns for the one Row * Maybe make it return [[[Int]]] as well?
 clueIsOne2 cluesTuple lst n =
-	case (snd cluesTuple) of
-	"East" -> insert [n]  (delete [1..(n-1)] ((eliminateAll cluesTuple lst n) !! (fst cluesTuple - 1)))
-	"West" -> reverse (insert [n]  (delete [1..(n-1)] ((eliminateAll cluesTuple lst n) !! (fst cluesTuple - 1))))
+ case (snd cluesTuple) of
+ "East" -> insert [n]  (delete [1..(n-1)] ((debugTrace "indexed array E = " $ eliminateAll cluesTuple lst n) !! debugTrace "line 152: index = " (fst cluesTuple - 1)) )
+ "West" -> reverse (insert [n]  (delete [1..(n-1)] ((debugTrace "indexed array W = " $ eliminateAll cluesTuple lst n) !! debugTrace "line 153: index = " (fst cluesTuple - 1))))
 --"Both"    -> lst -- can't happen
-	--"Neither" -> lst -- can't happen
+--"Neither" -> lst -- can't happen
 
 
 
@@ -169,10 +194,10 @@ eliminateAll _ [] _ = []
 eliminateAll cluesTuple lst numberToDelete =
  case (fst cluesTuple) of
   0 -> lst
-  1 -> [(deleteAll numberToDelete (lst !! 0))] ++ [(lst !! 1)] ++ [(lst !! 2)] ++ [(lst !! 3)]
-  2 -> [(lst !! 0)] ++ [(deleteAll numberToDelete (lst !! 1))] ++ [(lst !! 2)] ++ [(lst !! 3)]
-  3 -> [(lst !! 0)] ++ [(lst !! 1)] ++ [(deleteAll numberToDelete (lst !! 2))] ++ [(lst !! 3)]
-  4 -> [(lst !! 0)] ++ [(lst !! 1)] ++ [(lst !! 2)] ++ [(deleteAll numberToDelete (lst !! 3))]
+  1 -> debugTrace "line 172: " ([(deleteAll numberToDelete (lst !! 0))] ++ [(lst !! 1)] ++ [(lst !! 2)] ++ [(lst !! 3)])
+  2 -> debugTrace "line 173: " ([(lst !! 0)] ++ [(deleteAll numberToDelete (lst !! 1))] ++ [(lst !! 2)] ++ [(lst !! 3)])
+  3 -> debugTrace "line 174: " ([(lst !! 0)] ++ [(lst !! 1)] ++ [(deleteAll numberToDelete (lst !! 2))] ++ [(lst !! 3)])
+  4 -> debugTrace "line 175: " ([(lst !! 0)] ++ [(lst !! 1)] ++ [(lst !! 2)] ++ [(deleteAll numberToDelete (lst !! 3))])
 
  {-
 	helper to delete all instance of a number within the input [[Int]]
