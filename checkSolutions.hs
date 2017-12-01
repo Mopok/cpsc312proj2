@@ -79,7 +79,7 @@ isSolution (_,_,_,_) _ [] = False
 -- isSolution (top,right,bottom,left) lst
 isSolution originalClues n soln =
  isAllTrue (isValidRows soln (getRowClues originalClues) n) &&
- isAllTrue (isValidRows (rowToColumns soln (n+1)) (getColClues originalClues) n) 
+ isAllTrue (isValidRows (rowToColumns soln (n+1)) (getColClues originalClues) n) -- Check Col's validity
 
 -- isAllTrue (isValidRows soln (getColClues originalClues) n)
 -- n = 3
@@ -191,3 +191,92 @@ getRowClues clues = [getClue clues 4 x | x <- [1..4]]
  -}
 getColClues :: ([Int],[Int],[Int],[Int]) -> [[Int]]
 getColClues clues = [reverse (getClue clues 3 x) | x <- [1..4]]
+
+
+{-
+    Takes in the Original clues and array of array of possible numbers for the cell
+    Then eliminates some of them according to the rule.
+    Maybe for clues 1 and N for now.
+    ([Int],[Int],[Int],[Int]) -> [[[Int]]] -> [[[Int]]]
+    1) Get the clues from the orginial clues
+    2) Note where 1 and N is
+    3) elminate all 1s and Ns from that row/col
+-}
+eliminateObviousOnes :: ([Int],[Int],[Int],[Int]) -> [[[Int]]] -> [[[Int]]]
+eliminateObviousOnes _ [] = []
+-- eliminateObviousOnes originalClues lst =
+--  whereIsTheClue (getRowClues originalClues) 1
+
+
+
+{-
+	get rid of the N given the clue is one
+	n is the size of the puzzle = 4, 5
+-}
+eliminateN :: (Int,[Char]) -> [[[Int]]] -> Int -> [[[Int]]]
+eliminateN _ [] _ = []
+eliminateN cluesTuple lst n =
+ case (fst cluesTuple) of
+ 	1 -> eliminateWithSide (snd cluesTuple) (lst !! 0)
+ 	2 -> eliminateWithSide (snd cluesTuple) (lst !! 1)
+ 	3 -> eliminateWithSide (snd cluesTuple) (lst !! 2)
+ 	4 -> eliminateWithSide (snd cluesTuple) (lst !! 3)
+
+
+
+ {-
+	helper to identify which case of clue side it is
+	n is the size of the puzzle = 4, 5
+ -}
+eliminateWithSide :: (Int, [Char]) -> [[[Int]]] -> Int -> [[[Int]]]
+eliminateWithSide cluesTuple lst n =
+ case (snd cluesTuple) of
+ 	"West"    -> 
+ 	"East"    ->
+ 	"Both"    ->
+ 	"Neither" ->
+
+
+
+
+
+
+{-
+	Takes in the clues for all rows and the clue to look up, and 
+	return an array of Tuples (rowNumber, whichSide the clue is present)
+	ex) whereIsTheClue [[1,4],[2,2],[3,1],[3,2]] 1
+-}
+whereIsTheClue :: [[Int]] -> Int -> [(Int,[Char])]
+whereIsTheClue [] _ = []
+whereIsTheClue cluesForRows clueToFind =
+ zip (updateIndex cluesForRows clueToFind 1 []) 
+  [whichSideClue clues clueToFind | clues <- cluesForRows]
+ 
+
+{-
+	whichSideClue takes in [Int] which represents a clue for one row and Int which represents
+	the clue to find, and return if it's in the West or East side of the clue.
+-}
+whichSideClue:: [Int] -> Int -> [Char]
+whichSideClue [] _ = ""
+whichSideClue clues clueToFind = 
+ if (clues !! 0) == clueToFind && (clues !! 1) == clueToFind then "Both sides" 
+  else (if (clues !! 0) == clueToFind then "West" 
+   else (if (clues !! 1) == clueToFind then "East" else "Neither"))
+
+
+{-
+	takes in arrays of clues, clueToFind, Int and [Int] for 1-indexed counting and acc
+	and return a list of Int which represents in which row the clueToFind is present.
+	0 means the row does not have the clue.
+	n = 1 fixed for 1-base count
+    acc = [] to start from empty array
+	ex) updateIndex [[1,4],[2,2],[3,1],[3,2]] 1 1 []
+-}
+updateIndex :: [[Int]] -> Int -> Int -> [Int] -> [Int]
+updateIndex [] _ _ _ = []
+updateIndex cluesForRows clueToFind n acc =
+ if (clueToFind `elem` (head cluesForRows)) 
+  then [n] ++ updateIndex (tail cluesForRows) clueToFind (n+1) acc
+   else [0] ++ updateIndex (tail cluesForRows) clueToFind (n+1) acc
+

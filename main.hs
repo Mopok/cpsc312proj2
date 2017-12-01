@@ -148,5 +148,15 @@ unFlattenBoardh (x,y) n =
 
 -- unFlattenBoard [1,2,1,2] 2 = [[1,2],[1,2]]
 
-
-
+{-
+    Takes in the Original clues and array of array of possible numbers for the cell
+    Then eliminates some of them according to the rule.
+    Maybe for clues 1 and N for now.
+    ([Int],[Int],[Int],[Int]) -> [[[Int]]] -> [[[Int]]]
+    1) Get the clues from the orginial clues
+    2) Note where 1 and N is
+    3) elminate all 1s and Ns from that row/col
+-}
+eliminateObviousOnes :: ([Int],[Int],[Int],[Int]) -> [[[Int]]] -> [[[Int]]]
+eliminateObviousOnes _ [] = []
+eliminateObviousOnes originalClues lst
