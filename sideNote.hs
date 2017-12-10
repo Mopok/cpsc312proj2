@@ -1,5 +1,5 @@
 import Data.List
-
+import Debug.Trace (trace)
 {-
 clueIsOne cluesTuple lst =
  case (fst cluesTuple) of
@@ -33,30 +33,12 @@ eliminateWithSide clueSide lst n clueToDelete =
 
 
 {-
-    Takes in the Original clues and array of array of possible numbers for the cell
-    Then eliminates some of them according to the rule.
-    Maybe for clues 1 and N for now.
-    ([Int],[Int],[Int],[Int]) -> [[[Int]]] -> [[[Int]]]
-    1) Get the clues from the orginial clues
-    2) Note where 1 and N is
-    3) elminate all 1s and Ns from that row/col
--}
-eliminateObviousOnes :: ([Int],[Int],[Int],[Int]) -> [[[Int]]] -> Int -> [[[Int]]]
-eliminateObviousOnes _ [] _ = []
--- eliminateObviousOnes originalClues lst n =
---  whereIsTheClue (getRowClues originalClues) 1
---  whereIsTheClue (getRowClues originalClues) 4
--- could use iterate since it takes the previous iteration's result Then take the last, but runtime...
--- iterate (\ clueIsOne clue(n) x n <- x == clueIsN clue(n) lst n)
-
-
-{-
 	special helper for clue = 1
 	n == size of the puzzle i.e) 4
-	clueIsOne (1,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
-	clueIsOne (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
-	clueIsOne (3,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
-	clueIsOne (3,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+	clueIsOne3 (1,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+	clueIsOne3 (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+	clueIsOne3 (3,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+	clueIsOne3 (3,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
 -}
 clueIsOne3 :: (Int,[Char]) -> [[[Int]]] -> Int -> [[[Int]]]
 -- this rn returns for the one Row * Maybe make it return [[[Int]]] as well?
@@ -71,20 +53,20 @@ clueIsOne3 cluesTuple lst n =
   "West" -> 
    let slices = (splitAt (fst cluesTuple) lst) in
     (delete (last (fst slices)) (fst slices)) ++ 
-    (reverse [(insert [n]  (delete [1..(n-1)] ((eliminateAll cluesTuple lst n) !! (fst cluesTuple - 1))))]) ++
+    [(reverse (insert [n]  (delete [1..(n-1)] ((eliminateAll cluesTuple lst n) !! (fst cluesTuple - 1)))))] ++
     (snd slices)
 -- reverse (insert (insert [n]  (delete [1..(n-1)] ((eliminateAll cluesTuple lst n) !! (fst cluesTuple - 1)))) (delete (lst !! (fst cluesTuple)) lst))
---"Both"    -> lst -- can't happen
---"Neither" -> lst -- can't happen
+  "Both"    -> lst -- can't happend since the clue is One
+  "Neither" -> lst -- no mutation on the board
 
 
 {-
 	special helper for clue = 4
 	n == size of the puzzle i.e) 4
-	clueIsN (1,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
-	clueIsN (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
-	clueIsN (3,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
-	clueIsN (3,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+	clueIsN3 (1,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+	clueIsN3 (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+	clueIsN3 (3,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+	clueIsN3 (3,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
 
 -}
 clueIsN3 :: (Int,[Char]) -> [[[Int]]] -> Int -> [[[Int]]]
@@ -93,15 +75,84 @@ clueIsN3 cluesTuple lst n =
  case (snd cluesTuple) of
   "East" -> 
    let slices = (splitAt (fst cluesTuple) lst) in
-    (delete (last (fst slices)) (fst slices)) ++ [[x `insert` [] | x <- [1..n]]] ++ (snd slices)
+    (delete (last (fst slices)) (fst slices)) ++ [(reverse ([x `insert` [] | x <- [1..n]]))] ++ (snd slices)
   "West" -> 
    let slices = (splitAt (fst cluesTuple) lst) in
-    (delete (last (fst slices)) (fst slices)) ++ [(reverse ([x `insert` [] | x <- [1..n]]))] ++ (snd slices)
-
---"Both"    -> lst -- can't happen
---"Neither" -> lst -- can't happen
+    (delete (last (fst slices)) (fst slices)) ++ [[x `insert` [] | x <- [1..n]]] ++ (snd slices)
+  "Both"    -> lst -- can't happend since the clue is N
+  "Neither" -> lst -- no mutation on the board
 
 -- [ [ [1,2,3,4] , [5,6,7,8], [1,2,3,4], [5,6,7,8] ],  ]
+
+{-
+	eleimObv (now takes care of columns too)
+	ex) eliminateObviousOnes ([1,3,2,2],[3,2,1,2],[2,2,1,3],[2,2,3,1])  [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+-}
+eliminateObviousOnes originalClues board n =
+	transpose (eliminateObviousRowOnes (getColClues originalClues) (transpose (eliminateObviousRowOnes (getRowClues originalClues) board n)) n)
+-- eliminateObviousRowOnes (getRowClues ([1,3,2,2],[3,2,1,2],[2,2,1,3],[2,2,3,1])) [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+-- transpose (eliminateObviousRowOnes (getRowClues ([1,3,2,2],[3,2,1,2],[2,2,1,3],[2,2,3,1])) [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4)
+-- (eliminateObviousRowOnes (getColClues ([1,3,2,2],[3,2,1,2],[2,2,1,3],[2,2,3,1])) (transpose (eliminateObviousRowOnes (getRowClues ([1,3,2,2],[3,2,1,2],[2,2,1,3],[2,2,3,1])) [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4)) 4)
+
+{-
+    Takes in the Original clues and array of array of possible numbers for the cell
+    Then eliminates some of them according to the rule.
+    Maybe for clues 1 and N for now.
+    ([Int],[Int],[Int],[Int]) -> [[[Int]]] -> [[[Int]]]
+    1) Get the clues from the orginial clues
+    2) Note where 1 and N is
+    3) elminate all 1s and Ns from that row/col
+
+    ex) transpose (eliminateObviousRowOnes [[1,3],[3,1],[2,2],[2,2]] [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4) == col
+    eliminateObviousRowOnes [[1,4],[2,2],[3,1],[3,2]] [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+-}
+-- eliminateObviousRowOnes :: ([Int],[Int],[Int],[Int]) -> [[[Int]]] -> Int -> [[[Int]]]
+eliminateObviousRowOnes :: [[Int]] -> [[[Int]]] -> Int -> [[[Int]]]
+eliminateObviousRowOnes _ [] _ = []
+eliminateObviousRowOnes clues board n =
+ reduceBoardRowClueN reducedRowClueOne cluesForN n 
+  where 
+   reducedRowClueOne :: [[[Int]]]
+   reducedRowClueOne = reduceBoardRowClueOne board (whereIsTheClue clues 1) n
+   cluesForN :: [(Int,[Char])]
+   cluesForN = whereIsTheClue clues n
+   -- whereIsTheClue (getClues ([1,3,2,2],[3,2,1,2],[2,2,1,3],[2,2,3,1]) 4 4) 4
+   -- whereIsTheClue (getClues ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1]) 4 4) 4
+
+-- eliminateObviousOnes originalClues lst n =
+--  whereIsTheClue (getRowClues originalClues) 1
+--  whereIsTheClue (getRowClues originalClues) 4
+-- could use iterate since it takes the previous iteration's result Then take the last, but runtime...
+-- iterate (\ clueIsOne clue(n) x n <- x == clueIsN clue(n) lst n)
+
+
+{-
+	recursive function that will mutate the board with list of clues for clue One
+	takes in [[[Int]]] which represents the board
+		     [(Int,[Char])] which represents the list of clues
+		     n which is the size of the board
+    ex) reduceBoardRowClueOne [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ]  [(1,"West"),(2,"Neither"),(3,"East"),(4,"Neither")] 4
+
+-}
+reduceBoardRowClueOne :: [[[Int]]] -> [(Int, [Char])] -> Int -> [[[Int]]]
+reduceBoardRowClueOne board [] _ = board
+reduceBoardRowClueOne board clues n =
+ reduceBoardRowClueOne (clueIsOne3 (head clues) board n) (tail clues) n
+
+
+{-
+	recursive function that will mutate the board with list of clues for clue N
+	takes in [[[Int]]] which represents the board
+		     [(Int,[Char])] which represents the list of clues
+		     n which is the size of the board
+    ex) reduceBoardRowClueN [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ]  [(1,"East"),(2,"Neither"),(3,"Neither"),(4,"Neither")] 4
+-}
+reduceBoardRowClueN :: [[[Int]]] -> [(Int, [Char])] -> Int -> [[[Int]]]
+reduceBoardRowClueN board [] _ = board
+reduceBoardRowClueN board clues n =
+ reduceBoardRowClueN (clueIsN3 (head clues) board n) (tail clues) n
+
+
 
 
 
@@ -109,35 +160,36 @@ clueIsN3 cluesTuple lst n =
 
 {-
 	eliminateN
+	ex) eliminateN [(1,"West"),(2,"East")] [[[1,2],[1,2]],[[1,2],[1,2]]] 2
 	ex) eliminateN [(1,"West"),(0,"Neither"),(3,"East"),(0,"Neither")] [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
 -}
 eliminateN :: [(Int,[Char])] -> [[[Int]]] -> Int -> [[[Int]]]
 eliminateN [] _ _ = []
 eliminateN _ [] _ = []
 eliminateN clues lst n =
- if fst (head clues) /= 0
-  then [(clueIsOne2 (head clues) lst n)] ++ (eliminateN (tail clues) (tail lst) n)
-  else [(head lst)] ++ (eliminateN (tail clues) (tail lst) n)
-
+ if debugTrace ("line 118: " ++ show lst ++ " is it 0? ") (fst (head clues) /= 0)
+  then debugTrace ("line 119: " ++ show lst ++ " body: ") ([(clueIsOne2 (head clues) lst n)] ++ (eliminateN (tail clues) (tail lst) n))
+  else debugTrace ("line 120: " ++ show lst ++ " head: " ++ show [(head lst)] ++ "body:") ([(head lst)] ++ (eliminateN (tail clues) (tail lst) n))
 
 
 -- returning [[Int]] version
 {-
 special helper for clue = 4
 n == size of the puzzle i.e) 4
-clueIsN (1,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
-clueIsN (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+clueIsN2 (1,"East") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
+clueIsN2 (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
 -}
 clueIsN2 :: (Int,[Char]) -> [[[Int]]] -> Int -> [[Int]]
 -- this rn returns for the one Row * Maybe make it return [[[Int]]] as well?
 clueIsN2 cluesTuple lst n =
-	case (snd cluesTuple) of
-	"East" -> [insert x [] | x <- [1..n]]
-	"West" -> reverse [insert x [] | x <- [1..n]]
+ case (snd cluesTuple) of
+ "East" -> debugTrace ("line 134: ") [insert x [] | x <- [1..n]]
+ "West" -> debugTrace ("line 135: ") (reverse [insert x [] | x <- [1..n]])
 --"Both"    -> lst -- can't happen but what if I just make this lst !! 0 and use it later.. (Think this approach isn't the best since index is not considered..?)
 --"Neither" -> lst -- can't happen
 
-
+debugTrace :: Show a => String -> a -> a
+debugTrace s v = trace (s ++ show v) v
 
 {-
 special helper for clue = 1
@@ -148,11 +200,11 @@ clueIsOne2 (1,"West") [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,
 clueIsOne2 :: (Int,[Char]) -> [[[Int]]] -> Int -> [[Int]]
 -- this rn returns for the one Row * Maybe make it return [[[Int]]] as well?
 clueIsOne2 cluesTuple lst n =
-	case (snd cluesTuple) of
-	"East" -> insert [n]  (delete [1..(n-1)] ((eliminateAll cluesTuple lst n) !! (fst cluesTuple - 1)))
-	"West" -> reverse (insert [n]  (delete [1..(n-1)] ((eliminateAll cluesTuple lst n) !! (fst cluesTuple - 1))))
+ case (snd cluesTuple) of
+ "East" -> insert [n]  (delete [1..(n-1)] ((debugTrace "indexed array E = " $ eliminateAll cluesTuple lst n) !! debugTrace "line 152: index = " (fst cluesTuple - 1)) )
+ "West" -> reverse (insert [n]  (delete [1..(n-1)] ((debugTrace "indexed array W = " $ eliminateAll cluesTuple lst n) !! debugTrace "line 153: index = " (fst cluesTuple - 1))))
 --"Both"    -> lst -- can't happen
-	--"Neither" -> lst -- can't happen
+--"Neither" -> lst -- can't happen
 
 
 
@@ -169,10 +221,10 @@ eliminateAll _ [] _ = []
 eliminateAll cluesTuple lst numberToDelete =
  case (fst cluesTuple) of
   0 -> lst
-  1 -> [(deleteAll numberToDelete (lst !! 0))] ++ [(lst !! 1)] ++ [(lst !! 2)] ++ [(lst !! 3)]
-  2 -> [(lst !! 0)] ++ [(deleteAll numberToDelete (lst !! 1))] ++ [(lst !! 2)] ++ [(lst !! 3)]
-  3 -> [(lst !! 0)] ++ [(lst !! 1)] ++ [(deleteAll numberToDelete (lst !! 2))] ++ [(lst !! 3)]
-  4 -> [(lst !! 0)] ++ [(lst !! 1)] ++ [(lst !! 2)] ++ [(deleteAll numberToDelete (lst !! 3))]
+  1 -> debugTrace "line 172: " ([(deleteAll numberToDelete (lst !! 0))] ++ [(lst !! 1)] ++ [(lst !! 2)] ++ [(lst !! 3)])
+  2 -> debugTrace "line 173: " ([(lst !! 0)] ++ [(deleteAll numberToDelete (lst !! 1))] ++ [(lst !! 2)] ++ [(lst !! 3)])
+  3 -> debugTrace "line 174: " ([(lst !! 0)] ++ [(lst !! 1)] ++ [(deleteAll numberToDelete (lst !! 2))] ++ [(lst !! 3)])
+  4 -> debugTrace "line 175: " ([(lst !! 0)] ++ [(lst !! 1)] ++ [(lst !! 2)] ++ [(deleteAll numberToDelete (lst !! 3))])
 
  {-
 	helper to delete all instance of a number within the input [[Int]]
@@ -323,7 +375,8 @@ rowToColumn lst n =
 {-
 	get all columns
 	ex) rowToColumns [[4,3,2,1], [3,4,1,2], [2,1,3,4],[1,2,4,3]] 4
-	rowToColumn [[2,5,4,1,3],[5,3,1,2,4],[1,4,2,3,5],[3,2,5,4,1],[4,1,3,5,2]] 1
+	rowToColumns [[4,1,3,2],[2,3,4,1],[3,2,1,4],[1,4,2,3]] 4
+	rowToColumns [[2,5,4,1,3],[5,3,1,2,4],[1,4,2,3,5],[3,2,5,4,1],[4,1,3,5,2]] 1
 			-> [2,5,1,3,4]
 
 -}
@@ -340,7 +393,7 @@ rowToColumns lst n = [rowToColumn lst x | x <- [1..n]]
 	n is either 3 or 4 to get a column / row clue
 	m is [1..4]
 
-	ex) getClues ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1]) 4 -> [[1,4],[2,2],[3,1],[3,2]]
+	ex) getClues ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1]) 4 4 -> [[1,4],[2,2],[3,1],[3,2]]
 -}
 getClues :: ([Int],[Int],[Int],[Int]) -> Int -> Int -> [[Int]]
 getClues clues n m =
@@ -372,12 +425,16 @@ getNth (a,b,c,d) 4 = d
 
  {-
 	get the clues for rows
+	ex) getRowClues ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1])
+	getRowClues ([1,3,2,2],[3,2,1,2],[2,2,1,3],[2,2,3,1])
  -}
 getRowClues :: ([Int],[Int],[Int],[Int]) -> [[Int]]
 getRowClues clues = [getClue clues 4 x | x <- [1..4]]
 
  {-
 	get the clues for columns
+	ex) getColClues ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1])
+	getColClues ([1,3,2,2],[3,2,1,2],[2,2,1,3],[2,2,3,1])
  -}
 getColClues :: ([Int],[Int],[Int],[Int]) -> [[Int]]
 getColClues clues = [reverse (getClue clues 3 x) | x <- [1..4]]
@@ -436,7 +493,5 @@ whichSideClue clues clueToFind =
 getIndices :: [[Int]] -> Int -> Int -> [Int] -> [Int]
 getIndices [] _ _ _ = []
 getIndices cluesForRows clueToFind n acc =
- if (clueToFind `elem` (head cluesForRows)) 
-  then [n] ++ getIndices (tail cluesForRows) clueToFind (n+1) acc
-   else [0] ++ getIndices (tail cluesForRows) clueToFind (n+1) acc
+ [n] ++ getIndices (tail cluesForRows) clueToFind (n+1) acc
 

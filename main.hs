@@ -205,6 +205,7 @@ unFlattenBoardh (x,y) n =
 
 -- unFlattenBoard [1,2,1,2] 2 = [[1,2],[1,2]]
 
+
 {-
     Takes in the Original clues and array of array of possible numbers for the cell
     Then eliminates some of them according to the rule.
@@ -222,9 +223,5 @@ unFlattenBoardh (x,y) n =
 
 eliminateObviousOnes originalClues lst =
     transpose (eliminateObviousRowOnes originalClues (transpose (eliminateObviousRowOnes originalClues board n) ) n )
-
-
-
-
 
 
