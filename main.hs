@@ -3,6 +3,34 @@ import Data.List
 import Text.Printf
 import Data.List
 import CheckSolutions
+import Text.Printf
+import Data.Char
+
+
+
+-- -- showAns :: [[Int]] 
+printStrings :: [[String]] -> IO ()
+printStrings  = sequence_ . flattenActions . strToPrint  
+
+flattenActions :: [[IO ()]] -> [IO ()]
+flattenActions actions = concat $ intersperse [(putStrLn "")]  actions
+
+strToPrint :: [[String]] -> [[IO ()]]
+strToPrint strs = map (map putStrLn) strs  
+
+-- intToPrint :: Show a => [[a]] -> [[String]]
+intToPrint ints = map intsToString ints
+
+-- intToPrint [[4,1,3,2],[2,3,4,1],[3,2,1,4],[1,4,2,3]]
+intsToString :: [Int] -> String
+intsToString [] = []
+intsToString (h:t) =
+    (show h)++(intsToString t)
+
+
+printAns ans = 
+    putStr ( unlines  (map show ans) )
+-- printAns [[4,1,3,2],[2,3,4,1],[3,2,1,4],[1,4,2,3]]
 
 
 
@@ -124,9 +152,38 @@ allPermutationsh (p:ps) lst =
 
 -- allPermutationsh [1,2] [[2],[1]] = [[2,1], [1,1], [2,2], [2,1]]
 
-
 -- (map (\ z -> x:z ) ys)
 -- append x[0..n] to each element making new list each time
+
+
+
+
+-- NOT DONE
+-- Generate permutations without repeat in rows and cols
+
+
+-- Given n*n length list of cells and n, give permutations without repeats in rows and cols.
+-- smartPermutations :: [[Int]] -> Int -> [[Int]]
+-- smartPermutations (x:[]) _ = foldr (\ z y -> [z]:y ) [] x   -- Base case [[2,1]] -> [[2],[1]]
+-- smartPermutations (cell :ys) n i =
+--     (smartPermutationsh cell i (smartPermutations ys n (i+1) ) ) 
+
+
+-- -- 
+
+
+-- smartPermutationsh cell index permutations n = 
+
+
+
+-- given cell value, index of cell, permutation to apply value, n board (ex 2,3,4), and board size (ex 4,9,16) 
+-- Return board with value applied to permutation with emptys if not possible at any position
+-- apply :: [Int] -> Int -> [[Int]] -> Int -> Int -> [Int]
+-- apply cell i permutation n size =
+--     applyRow
+
+
+
 
 -- given list of boards and n (n*n) unflatten boards to have rows again. Returns List of Boards
 unFlattenBoards :: [[Int]] -> Int -> [[[Int]]]
@@ -157,6 +214,17 @@ unFlattenBoardh (x,y) n =
     2) Note where 1 and N is
     3) elminate all 1s and Ns from that row/col
 -}
-eliminateObviousOnes :: ([Int],[Int],[Int],[Int]) -> [[[Int]]] -> [[[Int]]]
-eliminateObviousOnes _ [] = []
-eliminateObviousOnes originalClues lst
+-- eliminateObviousOnes :: ([Int],[Int],[Int],[Int]) -> [[[Int]]] -> [[[Int]]]
+-- eliminateObviousOnes _ [] = []
+-- eliminateObviousOnes originalClues lst
+
+
+
+eliminateObviousOnes originalClues lst =
+    transpose (eliminateObviousRowOnes originalClues (transpose (eliminateObviousRowOnes originalClues board n) ) n )
+
+
+
+
+
+
