@@ -1,3 +1,4 @@
+module SideNote where
 import Data.List
 import Debug.Trace (trace)
 {-
@@ -89,7 +90,7 @@ clueIsN3 cluesTuple lst n =
 	ex) eliminateObviousOnes ([1,3,2,2],[3,2,1,2],[2,2,1,3],[2,2,3,1])  [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
 -}
 eliminateObviousOnes originalClues board n =
-	transpose (eliminateObviousRowOnes (getColClues originalClues) (transpose (eliminateObviousRowOnes (getRowClues originalClues) board n)) n)
+    transpose (eliminateObviousRowOnes (getColClues originalClues n) (transpose (eliminateObviousRowOnes (getRowClues originalClues n) board n)) n)
 -- eliminateObviousRowOnes (getRowClues ([1,3,2,2],[3,2,1,2],[2,2,1,3],[2,2,3,1])) [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4
 -- transpose (eliminateObviousRowOnes (getRowClues ([1,3,2,2],[3,2,1,2],[2,2,1,3],[2,2,3,1])) [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4)
 -- (eliminateObviousRowOnes (getColClues ([1,3,2,2],[3,2,1,2],[2,2,1,3],[2,2,3,1])) (transpose (eliminateObviousRowOnes (getRowClues ([1,3,2,2],[3,2,1,2],[2,2,1,3],[2,2,3,1])) [ [[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]],[[1,2,3,4],[1,2,3,4],[1,2,3,4],[1,2,3,4]] ] 4)) 4)
@@ -313,15 +314,16 @@ isAllTrue (h:t) = if (h == True) then isAllTrue t else False
 	The four tuple is the source for the clue
 	[Int] is Soln we want to check
 	Int is the size n
-	
-	ex) isSolution ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1]) [[4,3,2,1],[3,4,1,2],[2,1,3,4],[1,2,4,3]] 3
+	n is n-1 here!
+	ex) isSolution ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1]) 3 [[4,3,2,1],[3,4,1,2],[2,1,3,4],[1,2,4,3]]
+	ex) isSolution ([2,1,2,5,3], [3,2,1,3,2], [2,1,2,4,2], [2,2,3,1,2]) 4 [[2,5,4,1,3],[5,3,1,2,4],[1,4,2,3,5],[3,2,5,4,1],[4,1,3,5,2]]
  -}
 isSolution :: ([Int],[Int],[Int],[Int]) -> Int -> [[Int]] -> Bool
 isSolution (_,_,_,_) _ [] = False
 -- isSolution (top,right,bottom,left) lst
 isSolution originalClues n soln =
- isAllTrue (isValidRows soln (getRowClues originalClues) n) &&
- isAllTrue (isValidRows (rowToColumns soln (n+1)) (getColClues originalClues) n) -- Check Col's validity
+ isAllTrue (isValidRows soln (getRowClues originalClues (n+1)) n) &&
+ isAllTrue (isValidRows (rowToColumns soln (n+1)) (getColClues originalClues (n+1)) n) -- Check Col's validity
 
 -- isAllTrue (isValidRows soln (getColClues originalClues) n)
 -- n = 3
@@ -405,7 +407,9 @@ getClues clues n m =
 	m is 1
 	if n = 4 -> we get the clue for a row
 	if n = 3 -> we get the clue for a column
-	ex) getClue ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1]) 4 1 ->
+	ex) getClue ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1]) 4 1 -> [1,4]
+    ex) getClue ([2,1,2,5,3], [3,2,1,3,2], [2,1,2,4,2], [2,2,3,1,2]) 4 5 -> [2,2]
+    ex) getClue ([2,1,2,5,3], [3,2,1,3,2], [2,1,2,4,2], [2,2,3,1,2]) 4 1 -> [2,3]
 
 -}
 getClue :: ([Int],[Int],[Int],[Int]) -> Int -> Int -> [Int]
@@ -425,19 +429,19 @@ getNth (a,b,c,d) 4 = d
 
  {-
 	get the clues for rows
-	ex) getRowClues ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1])
-	getRowClues ([1,3,2,2],[3,2,1,2],[2,2,1,3],[2,2,3,1])
+	ex) getRowClues ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1]) 4
+	ex) getRowClues ([2,1,2,5,3], [3,2,1,3,2], [2,1,2,4,2], [2,2,3,1,2]) 5
  -}
-getRowClues :: ([Int],[Int],[Int],[Int]) -> [[Int]]
-getRowClues clues = [getClue clues 4 x | x <- [1..4]]
+getRowClues :: ([Int],[Int],[Int],[Int]) -> Int -> [[Int]]
+getRowClues clues n = [getClue clues 4 x | x <- [1..n]]
 
  {-
 	get the clues for columns
 	ex) getColClues ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1])
-	getColClues ([1,3,2,2],[3,2,1,2],[2,2,1,3],[2,2,3,1])
+	ex) getColClues ([2,1,2,5,3], [3,2,1,3,2], [2,1,2,4,2], [2,2,3,1,2]) 5
  -}
-getColClues :: ([Int],[Int],[Int],[Int]) -> [[Int]]
-getColClues clues = [reverse (getClue clues 3 x) | x <- [1..4]]
+getColClues :: ([Int],[Int],[Int],[Int]) -> Int -> [[Int]]
+getColClues clues n = [reverse (getClue clues 3 x) | x <- [1..n]]
 
 
 

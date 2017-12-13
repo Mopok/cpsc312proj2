@@ -1,5 +1,3 @@
-module CheckSolutions where
-
 import Data.List
 -- CPSC 312 Project 2 Jin Min
 -- import Math.Geometry.Grid.Square
@@ -39,7 +37,8 @@ isValidRow lst w e =
 -- by returning [Bool], we can see which row is not valid ; useful for user maybe?
 {-
 	n is (n-1)
-	ex) [[4,3,2,1],[3,4,1,2],[2,1,3,4],[1,2,4,3]] [[1,4],[2,2],[3,1],[3,2]] 3
+	ex) isValidRows [[4,3,2,1],[3,4,1,2],[2,1,3,4],[1,2,4,3]] [[1,4],[2,2],[3,1],[3,2]] 3
+	ex) isValidRows [[2,5,4,1,3],[5,3,1,2,4],[1,4,2,3,5],[3,2,5,4,1],[4,1,3,5,2]] [[2,3],[1,2],[3,1],[2,3],[2,2]] 4
 -}
 isValidRows :: [[Int]] -> [[Int]] -> Int -> [Bool]
 isValidRows [] _ _ = [False]
@@ -73,7 +72,8 @@ isAllTrue (h:t) = if (h == True) then isAllTrue t else False
 	[Int] is Soln we want to check
 	Int is the size n
 	
-	ex) isSolution ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1]) [[4,3,2,1],[3,4,1,2],[2,1,3,4],[1,2,4,3]] 3
+	ex) isSolution ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1]) 3 [[4,3,2,1],[3,4,1,2],[2,1,3,4],[1,2,4,3]] 
+	ex) isSolution ([2,1,2,5,3], [3,2,1,3,2], [2,1,2,4,2], [2,2,3,1,2]) 5 [[2,5,4,1,3],[5,3,1,2,4],[1,4,2,3,5],[3,2,5,4,1],[4,1,3,5,2]]
  -}
 isSolution :: ([Int],[Int],[Int],[Int]) -> Int -> [[Int]] -> Bool
 isSolution (_,_,_,_) _ [] = False
@@ -163,12 +163,16 @@ getClues clues n m =
 	m is 1
 	if n = 4 -> we get the clue for a row
 	if n = 3 -> we get the clue for a column
-	ex) getClue ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1]) 4 1 ->
+	ex) getClue ([1,2,3,3],[4,2,1,2],[2,1,2,4],[3,3,2,1]) 4 1 -> [1,4]
+	ex) getClue ([2,1,2,5,3], [3,2,1,3,2], [2,1,2,4,2], [2,2,3,1,2]) 4 5 -> [2,2]
+	ex) getClue ([2,1,2,5,3], [3,2,1,3,2], [2,1,2,4,2], [2,2,3,1,2]) 4 1 -> [2,3]
 
 -}
 getClue :: ([Int],[Int],[Int],[Int]) -> Int -> Int -> [Int]
 getClue clues n m =
  [((getNth clues n) !! ((length (getNth clues n)) - m))] ++ [((getNth clues (n-2)) !! (m-1))]
+
+
 
 {-
 	helper to get nth element of n sized tuple
